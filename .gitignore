@@ -1,3 +1,7 @@
 venv/
 template.py
-research/
+research/research.ipynb
+research/artifacts/
+research/logs/
+artifacts/
+logs/

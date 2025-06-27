@@ -5,3 +5,4 @@ research/artifacts/
 research/logs/
 artifacts/
 logs/
+.env

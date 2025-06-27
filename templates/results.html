@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wine Quality Prediction Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            padding: 3rem 0;
+        }
+        .content-section {
+            padding: 2rem;
+        }
+        .quality-score {
+            font-size: 4rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .quality-badge {
+            font-size: 1.5rem;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            display: inline-block;
+            margin: 1rem 0;
+        }
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .quality-meter {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        .quality-fill {
+            height: 100%;
+            transition: width 1s ease;
+        }
+        .input-summary {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .input-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .input-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="main-container">
+                    <!-- Hero Section -->
+                    <div class="hero-section text-center">
+                        <div class="container">
+                            <h1 class="display-4 fw-bold mb-3">
+                                <i class="fas fa-chart-line me-3"></i>
+                                Prediction Results
+                            </h1>
+                            <p class="lead mb-0">Your wine quality assessment is ready</p>
+                        </div>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div class="content-section">
+                        <!-- Quality Score -->
+                        <div class="text-center">
+                            <div class="quality-score text-{{ quality_color }}">
+                                {{ "%.1f"|format(prediction) }}
+                            </div>
+                            <div class="quality-badge bg-{{ quality_color }} text-white">
+                                <i class="fas fa-{{ 'star' if quality_category == 'Excellent' else 'thumbs-up' if quality_category == 'Good' else 'minus' if quality_category == 'Average' else 'times' }} me-2"></i>
+                                {{ quality_category }} Quality
+                            </div>
+                            
+                            <!-- Quality Meter -->
+                            <div class="quality-meter">
+                                <div class="quality-fill bg-{{ quality_color }}" style="width: {{ (prediction / 10) * 100 }}%"></div>
+                            </div>
+                            <p class="text-muted">Quality Score: {{ "%.1f"|format(prediction) }}/10</p>
+                        </div>
+
+                        <!-- Quality Interpretation -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="feature-card">
+                                    <h5><i class="fas fa-info-circle text-info me-2"></i>Quality Interpretation</h5>
+                                    {% if quality_category == "Excellent" %}
+                                        <p class="text-success">This wine shows exceptional characteristics with balanced acidity, smooth tannins, and complex flavors. It represents the highest quality tier.</p>
+                                    {% elif quality_category == "Good" %}
+                                        <p class="text-info">This wine demonstrates good quality with pleasant aromas, balanced structure, and enjoyable drinking experience.</p>
+                                    {% elif quality_category == "Average" %}
+                                        <p class="text-warning">This wine has acceptable quality with standard characteristics. It's drinkable but may lack complexity.</p>
+                                    {% else %}
+                                        <p class="text-danger">This wine has below-average quality with noticeable flaws in taste, aroma, or structure.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="feature-card">
+                                    <h5><i class="fas fa-lightbulb text-warning me-2"></i>Recommendations</h5>
+                                    {% if quality_category == "Excellent" %}
+                                        <p>Perfect for special occasions, wine tastings, or as a premium selection. Consider cellaring for enhanced aging potential.</p>
+                                    {% elif quality_category == "Good" %}
+                                        <p>Suitable for dinner parties, casual drinking, or as a reliable everyday wine choice.</p>
+                                    {% elif quality_category == "Average" %}
+                                        <p>Best consumed young, suitable for cooking or casual occasions. Consider pairing with food to enhance experience.</p>
+                                    {% else %}
+                                        <p>May be suitable for cooking purposes or as a learning experience. Consider trying different wine styles.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Input Summary -->
+                        <div class="input-summary">
+                            <h5><i class="fas fa-list-alt text-primary me-2"></i>Input Parameters Summary</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-item">
+                                        <span><i class="fas fa-tint me-2"></i>Fixed Acidity</span>
+                                        <strong>{{ "%.2f"|format(input_data[0]) }}</strong>
+                                    </div>
+                                    <div class="input-item">
+                                        <span><i class="fas fa-wind me-2"></i>Volatile Acidity</span>
+                                        <strong>{{ "%.2f"|format(input_data[1]) }}</strong>
+                                    </div>
+                                    <div class="input-item">
+                                        <span><i class="fas fa-lemon me-2"></i>Citric Acid</span>
+                                        <strong>{{ "%.2f"|format(input_data[2]) }}</strong>
+                                    </div>
+                                    <div class="input-item">
+                                        <span><i class="fas fa-cookie-bite me-2"></i>Residual Sugar</span>
+                                        <strong>{{ "%.2f"|format(input_data[3]) }}</strong>
+                                    </div>
+                                    <div class="input-item">
+                                        <span><i class="fas fa-salt me-2"></i>Chlorides</span>
+                                        <strong>{{ "%.3f"|format(input_data[4]) }}</strong>
+                                    </div>
+                                    <div class="input-item">
+                                        <span><i class="fas fa-smog me-2"></i>Free Sulfur Dioxide</span>
+                                        <strong>{{ "%.1f"|format(input_data[5]) }}</strong>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-item">
+                                        <span><i class="fas fa-cloud me-2"></i>Total Sulfur Dioxide</span>
+                                        <strong>{{ "%.1f"|format(input_data[6]) }}</strong>
+                                    </div>
+                                    <div class="input-item">
+                                        <span><i class="fas fa-weight-hanging me-2"></i>Density</span>
+                                        <strong>{{ "%.4f"|format(input_data[7]) }}</strong>
+                                    </div>
+                                    <div class="input-item">
+                                        <span><i class="fas fa-vial me-2"></i>pH</span>
+                                        <strong>{{ "%.2f"|format(input_data[8]) }}</strong>
+                                    </div>
+                                    <div class="input-item">
+                                        <span><i class="fas fa-atom me-2"></i>Sulphates</span>
+                                        <strong>{{ "%.2f"|format(input_data[9]) }}</strong>
+                                    </div>
+                                    <div class="input-item">
+                                        <span><i class="fas fa-wine-bottle me-2"></i>Alcohol</span>
+                                        <strong>{{ "%.1f"|format(input_data[10]) }}%</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="text-center mt-4">
+                            <a href="/" class="btn btn-primary me-3">
+                                <i class="fas fa-home me-2"></i>
+                                Make Another Prediction
+                            </a>
+                            <button class="btn btn-outline-secondary" onclick="window.print()">
+                                <i class="fas fa-print me-2"></i>
+                                Print Results
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animate the quality meter on page load
+        window.addEventListener('load', function() {
+            const qualityFill = document.querySelector('.quality-fill');
+            qualityFill.style.width = '0%';
+            setTimeout(() => {
+                qualityFill.style.width = '{{ (prediction / 10) * 100 }}%';
+            }, 500);
+        });
+    </script>
+</body>
+</html>
